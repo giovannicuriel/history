@@ -77,7 +77,8 @@ elif os.environ.get("HISTORY_MODULE", None) == "persister":
         ],
         install_requires=[
             "pymongo==3.2.2",
-            "dojot.module==0.0.1a1"
+            "dojot.module==0.0.1a1",
+            "python-dateutil==2.7.5"
         ],
         extras_require={
             "dev": [
