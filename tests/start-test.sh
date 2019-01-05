@@ -7,7 +7,7 @@ cd ..
 )
 echo Starting dredd
 dredd --hookfiles "./tests/dredd-hooks/*hook.py" \
- --server "gunicorn history.app:app \
+ --server "gunicorn dojot.history.app:app \
           --bind 0.0.0.0:8000 \
           --reload -R \
           --access-logfile - \

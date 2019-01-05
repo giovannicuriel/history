@@ -9,7 +9,7 @@ if [ $1 = 'start' ]; then
             echo Executed $retries retries, aborting
             exit 1
         fi
-        exec gunicorn history.app:app \
+        exec gunicorn dojot.history.history:app \
                   --bind 0.0.0.0:8000 \
                   --reload -R \
                   --access-logfile - \
