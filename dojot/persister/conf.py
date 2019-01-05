@@ -11,7 +11,7 @@ import os
 import logging
 import os
 
-LOGGER = logging.getLogger("history." + __name__)
+LOGGER = logging.getLogger("persister." + __name__)
 LOGGER.addHandler(logging.StreamHandler())
 LOGGER.setLevel(logging.INFO)
 

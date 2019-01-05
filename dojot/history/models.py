@@ -11,7 +11,7 @@ import falcon
 import pymongo
 import requests
 
-from history import conf
+from dojot.history import conf
 
 logger = logging.getLogger('history.' + __name__)
 logger.addHandler(logging.StreamHandler())
@@ -149,9 +149,9 @@ class DeviceHistory(object):
             d['ts'] = d['ts'].isoformat() + 'Z'
             history.append(d)
         return history
-        
+
     @staticmethod
-    def on_get(req, resp, device_id):  
+    def on_get(req, resp, device_id):
 
         collection = HistoryUtil.get_collection(req.context['related_service'], device_id)
 
@@ -164,7 +164,7 @@ class DeviceHistory(object):
                     history[attr] = DeviceHistory.get_single_attr(collection, query)
             else:
                 history = DeviceHistory.get_single_attr(
-                collection, DeviceHistory.parse_request(req, req.params['attr']))
+                    collection, DeviceHistory.parse_request(req, req.params['attr']))
                 if len(history) == 0:
                     msg = "No data for the given attribute could be found"
                     raise falcon.HTTPNotFound(title="Attr not found", description=msg)

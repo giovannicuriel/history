@@ -26,7 +26,7 @@ resp_json = {
         ]
     },
     "created": "2018-08-02T12:52:29.310182+00:00",
-    "id": "8b0584",
+    "id": "labtemp",
     "label": "MyAwesomeDevice",
     "status": "offline",
     "templates": [
@@ -36,4 +36,3 @@ resp_json = {
 @app.route('/device/<device_id>')
 def get_device(device_id):
     return json.dumps(resp_json)
-    

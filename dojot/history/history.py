@@ -8,8 +8,7 @@ App runner
 import falcon
 
 # Local imports
-from history import conf
-from history.api.models import DeviceHistory, STHHistory, AuthMiddleware
+from dojot.history.models import DeviceHistory, STHHistory, AuthMiddleware
 
 # Create falcon app
 app = falcon.API(middleware=[AuthMiddleware()])

@@ -4,7 +4,7 @@ import time
 import pymongo
 from datetime import datetime
 from dateutil.parser import parse
-from history import conf
+from dojot.persister import conf
 from dojot.module import Messenger, Config
 from dojot.module.logger import Log
 
