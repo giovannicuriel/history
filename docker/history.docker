@@ -2,27 +2,29 @@ FROM python:3.6-alpine as basis
 
 RUN apk update && apk --no-cache add build-base postgresql-dev libffi-dev git libc6-compat linux-headers bash dumb-init
 
-RUN pip install cython
+RUN mkdir -p /opt/history/requirements
+WORKDIR /opt/history
 
-RUN mkdir -p /usr/src/app/requirements
-WORKDIR /usr/src/app
-
-RUN python3 -m venv /usr/src/venv
-ENV VIRTUAL_ENV="/usr/src/venv"
+RUN python3 -m venv /opt/history/venv
+ENV VIRTUAL_ENV=/opt/history/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-ADD . /usr/src/app
-RUN ["python", "setup.py", "develop"]
+COPY ./requirements ./requirements
+ENV HISTORY_MODULE="history"
+RUN ["python3", "-m", "pip", "install", "-r", "./requirements/requirements-history.txt"]
+
+COPY . .
+RUN ["python3", "./setup.py", "install"]
 
 FROM python:3.6-alpine
 
-COPY --from=basis /usr/src/venv /usr/src/venv
-COPY --from=basis /usr/src/app /usr/src/app
+COPY --from=basis /opt/history/venv /opt/history/venv
+COPY ./docker/falcon-docker-entrypoint.sh /opt/history/falcon-docker-entrypoint.sh
 
-ENV VIRTUAL_ENV="/usr/src/venv"
+ENV VIRTUAL_ENV="/opt/history/venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-WORKDIR /usr/src/app
+WORKDIR /opt/history
 
 EXPOSE 8000
 
-CMD ["sh", "./docker/falcon-docker-entrypoint.sh", "start"]
+CMD ["sh", "./falcon-docker-entrypoint.sh", "start"]

@@ -2,25 +2,28 @@ FROM python:3.6-alpine as basis
 
 RUN apk update && apk --no-cache add build-base postgresql-dev libffi-dev git libc6-compat linux-headers bash dumb-init
 
-RUN pip install cython
+RUN mkdir -p /opt/persister/requirements
+WORKDIR /opt/persister
 
-RUN mkdir -p /usr/src/app/requirements
-WORKDIR /usr/src/app
-
-RUN python3 -m venv /usr/src/venv
-ENV VIRTUAL_ENV="/usr/src/venv"
+RUN python3 -m venv /opt/persister/venv
+ENV VIRTUAL_ENV=/opt/persister/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-ADD . /usr/src/app
-RUN ["python", "setup.py", "develop"]
+COPY ./requirements ./requirements
+ENV HISTORY_MODULE="persister"
+RUN ["python3", "-m", "pip", "install", "-r", "./requirements/requirements-persister.txt"]
+
+COPY . .
+RUN ["python3", "./setup.py", "install"]
 
 FROM python:3.6-alpine
 
-COPY --from=basis /usr/src/venv /usr/src/venv
-COPY --from=basis /usr/src/app /usr/src/app
+COPY --from=basis /opt/persister/venv /opt/persister/venv
 
-ENV VIRTUAL_ENV="/usr/src/venv"
+ENV VIRTUAL_ENV="/opt/persister/venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-WORKDIR /usr/src/app
+WORKDIR /opt/persister
 
-CMD ["python", "history/subscriber/persister.py"]
+EXPOSE 8000
+
+CMD ["python", "-m", "dojot.persister.persister"]
