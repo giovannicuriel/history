@@ -15,6 +15,5 @@ if [ $TRAVIS_PULL_REQUEST == false ] ; then
     docker push $tag
   }
 
-  buildPublish "history"
-  buildPublish "persister"
+  buildPublish ${HISTORY_MODULE}
 fi

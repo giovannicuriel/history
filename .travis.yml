@@ -4,19 +4,25 @@ services:
   - mongodb
 python:
   - '3.6'
-install:
-  - pip install -r requirements/requirements.txt -r tests/requirements.txt
-  - npm install -g dredd --no-optional
-before_script:
-  - python setup.py install
 env:
   global:
     - HISTORY_DB_ADDRESS: "localhost"
-
+matrix:
+  include:
+    - name: "history"
+      env: HISTORY_MODULE="history"
+    - name: "persister"
+      env: HISTORY_MODULE="persister"
+install:
+  - pip install -r requirements/requirements-history.txt
+  - pip install -r requirements/requirements-persister.txt
+  - pip install -r tests/requirements.txt
+  - npm install -g dredd --no-optional
+before_script:
+  - python setup.py install
 script:
-  - docker build -t history -f ./docker/history.docker .
-  - docker build -t persister -f ./docker/persister.docker .
-  - ./tests/start-test.sh
+  - docker build -t ${HISTORY_MODULE} -f ./docker/${HISTORY_MODULE}.docker .
+  - if [ ${HISTORY_MODULE} == "history" ]; then ./tests/start-test.sh; fi
 after_success:
   - travis/publish.sh
   - travis/deploy-gh-pages.sh
