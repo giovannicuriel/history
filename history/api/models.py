@@ -87,7 +87,7 @@ class HistoryUtil(object):
         else:
             raise falcon.HTTPNotFound(title="Device not found",
                                       description="No data for the given device could be found")
-    
+
     @staticmethod
     def check_type(arg):
         logger.debug(arg)
@@ -131,9 +131,9 @@ class DeviceHistory(object):
             query = {'attr': attr, 'value': {'$ne': ' '}}
         ts_filter = {}
         if 'dateFrom' in request.params.keys():
-            ts_filter['$gte'] = dateutil.parser.parse(request.params['dateFrom'])
+            ts_filter['$gte'] = dateutil.parser.isoparse(request.params['dateFrom'])
         if 'dateTo' in request.params.keys():
-            ts_filter['$lte'] = dateutil.parser.parse(request.params['dateTo'])
+            ts_filter['$lte'] = dateutil.parser.isoparse(request.params['dateTo'])
         if len(ts_filter.keys()) > 0:
             query['ts'] = ts_filter
 
@@ -168,9 +168,9 @@ class DeviceHistory(object):
             d['ts'] = d['ts'].isoformat() + 'Z'
             history.append(d)
         return history
-        
+
     @staticmethod
-    def on_get(req, resp, device_id):  
+    def on_get(req, resp, device_id):
 
         collection = HistoryUtil.get_collection(req.context['related_service'], device_id)
 
@@ -211,7 +211,7 @@ class NotificationHistory(object):
         history = {}
         logger.info("Will retrieve notifications")
         filter_query = req.params
-        query = NotificationHistory.get_query(filter_query)      
+        query = NotificationHistory.get_query(filter_query)
         history['notifications'] = NotificationHistory.get_notifications(collection, query)
         if(not history['notifications']):
             msg = "There aren't notifications for this tenant on this filter"
@@ -229,16 +229,16 @@ class NotificationHistory(object):
 
                 if(field != "subject"):
                     field = "metaAttrsFilter." + field
-                
-                value = HistoryUtil.model_value(value, HistoryUtil.check_type(value)) 
 
-                query[field] = value 
+                value = HistoryUtil.model_value(value, HistoryUtil.check_type(value))
+
+                query[field] = value
 
         sort = [('ts', pymongo.DESCENDING)]
         ls_filter = {"_id" : False, '@timestamp': False, '@version': False}
 
         return {"query": query, "limit_val": 10, "sort": sort, "filter": ls_filter}
-    
+
     @staticmethod
     def get_notifications(collection, query):
         docs = collection.find(query['query'], query['filter'], limit=query['limit_val'], sort=query['sort'])
